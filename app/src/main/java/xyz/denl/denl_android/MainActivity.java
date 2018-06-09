@@ -3,6 +3,7 @@ package xyz.denl.denl_android;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -53,10 +54,17 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView mWebView;
 
+    // Auto Login
+    private SharedPreferences setting;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setting = getSharedPreferences("setting", 0);
+        editor = setting.edit();
 
         mWebView = (WebView) findViewById(R.id.webView);
         WebSettings webSettings = mWebView.getSettings();
@@ -241,8 +249,9 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void savePassword(final String ID, final String PW) {
-
-
+            editor.putString("id", ID);
+            editor.putString("pw", PW);
+            editor.commit();
         }
 
         @JavascriptInterface
