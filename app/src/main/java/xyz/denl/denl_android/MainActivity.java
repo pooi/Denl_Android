@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     // Auto Login
     private SharedPreferences setting;
     private SharedPreferences.Editor editor;
+    private boolean isAttemptLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +165,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void login(){
+
+        isAttemptLogin = true;
+
+        final String loginId = setting.getString("id", null);
+        final String loginPw = setting.getString("pw", null);
+
+        if(loginId != null && loginPw != null) {
+
+            mWebView.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                        mWebView.evaluateJavascript("javascript:loginSejoingWithWebkit('" + loginId + "', '" + loginPw + "');", new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String s) {
+                                Log.e("Login", s);
+                            }
+                        });
+                }
+            });
+
+        }
+    }
 
 
     @Override
@@ -212,9 +237,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-
-//            et.setText(url);
-
+            if(!isAttemptLogin){
+                login();
+            }
         }
     }
 
@@ -256,8 +281,9 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void logout() {
-
-
+            editor.remove("id");
+            editor.remove("pw");
+            editor.commit();
         }
 
     }
